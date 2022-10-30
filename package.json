@@ -1,5 +1,6 @@
 {
   "name": "frontend",
+  "homepage": "https://colniiiiko.github.io/react-router-and-api/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
