@@ -48,7 +48,8 @@ const router = createBrowserRouter(
         element={<Notfoundpage />}
       />
     </Route>
-  )
+  ),
+  { basename: process.env.PUBLIC_URL || '' }
 );
 
 function App() {
