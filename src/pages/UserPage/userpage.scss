@@ -1,0 +1,28 @@
+.user{
+    display: flex;
+    flex-direction: column;
+    row-gap: 25px;
+}
+
+.user-info{
+    &__name{
+        font-size: 20px;
+    }
+    &__sub,
+    &__sub a{
+        color: rgb(121, 121, 121);
+    }
+
+    &__sub a{
+        text-decoration: underline;
+    }
+}
+
+.user-albums{
+    padding-left: 10px;
+    list-style-type: none;
+    &__item{
+        list-style-type: none;
+        text-decoration: none;
+    }
+}

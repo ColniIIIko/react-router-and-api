@@ -1,0 +1,18 @@
+.albums-list{
+    display: flex;
+    flex-direction: column;
+    row-gap: 3px;
+    font-size: 18px;
+
+    & li{
+        list-style-type: none;
+    }
+
+    &__item{
+        color: rgb(63, 52, 52);
+        &:hover,
+        &:focus{
+            color: #000;
+        }
+    }
+}

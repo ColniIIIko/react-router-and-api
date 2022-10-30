@@ -1,26 +1,59 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from 'react-router-dom';
+import Albumpage, { loader as albumLoader } from './pages/AlbumPage/Albumpage';
+import Albumspage, { loader as albumsLoader } from './pages/AlbumsPage/Albumspage';
+import Homepage from './pages/Homepage/Homepage';
+import Layout from './pages/Layout/Layout';
+import Notfoundpage from './pages/NotFoundPage/Notfoundpage';
+import Userpage, { loader as userLoader } from './pages/UserPage/Userpage';
+import Userspage, { loader as usersLoader } from './pages/UsersPage/Userspage';
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route
+      path='/'
+      element={<Layout />}
+    >
+      <Route
+        path=''
+        element={<Homepage />}
+      />
+      <Route
+        path='users'
+        element={<Userspage />}
+        loader={usersLoader}
+      />
+      <Route
+        path='users/:id'
+        element={<Userpage />}
+        loader={userLoader}
+      />
+      <Route
+        path='albums'
+        element={<Albumspage />}
+        loader={albumsLoader}
+      />
+      <Route
+        path='albums/:id'
+        element={<Albumpage />}
+        loader={albumLoader}
+      />
+      <Route
+        path='*'
+        element={<Notfoundpage />}
+      />
+    </Route>
+  )
+);
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
+
