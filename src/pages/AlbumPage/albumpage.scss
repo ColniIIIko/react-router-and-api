@@ -19,6 +19,10 @@
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         justify-items: start;
         gap:15px;
+
+        @media screen and (max-width: 580px) {
+            justify-items: center;
+        }
     }
 
     &__photos img{
