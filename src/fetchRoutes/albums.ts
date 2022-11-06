@@ -1,22 +1,15 @@
 import { Album, AlbumPhoto } from '../types/types';
 
-export const getUserAlbums = async (userId: string): Promise<Album[]> =>
-  (await fetch(`https://jsonplaceholder.typicode.com/users/${userId}/albums`).then((r) => {
-    if (r.status === 404) throw Error('cannot find albums');
-    return r.json();
-  })) as Album[];
+const BASE_URL = 'https://jsonplaceholder.typicode.com/';
 
-export const getAlbums = async () =>
-  (await fetch(`https://jsonplaceholder.typicode.com/albums`).then((r) => r.json())) as Album[];
+const get = (url, error) => fetch(`${BASE_URL}/${url}`).then(
+  r => r.status === 404 ? throw new Error(error) : r.json()
+)
 
-export const getAlbum = async (albumId: string): Promise<Album> =>
-  (await fetch(`https://jsonplaceholder.typicode.com/albums/${albumId}`).then((r) => {
-    if (r.status === 404) throw Error('cannot find album');
-    return r.json();
-  })) as Album;
+export const getUserAlbums = (userId: string): Promise<Album[]> => get(`users/${userId}/albums`, 'cannot find albums');
 
-export const getAlbumPhotos = async (albumId: string): Promise<AlbumPhoto[]> =>
-  (await fetch(`https://jsonplaceholder.typicode.com/photos?albumId=${albumId}`).then((r) => {
-    if (r.status === 404) throw Error('cannot find album');
-    return r.json();
-  })) as AlbumPhoto[];
+export const getAlbums = (): Promise<Album[]> => get(`albums`, 'cannot find albums');
+
+export const getAlbum = (id: string): Promise<Album> => get(`albums/${id}`, `cannot find album`);
+
+export const getAlbumPhotos = (id: string): Promise<AlbumPhoto[]> => get(`albums/${id}/photos`, 'cannot get photos');
