@@ -20,3 +20,8 @@ export const getAlbumPhotos = async (albumId: string): Promise<AlbumPhoto[]> =>
     if (r.status === 404) throw Error('cannot find album');
     return r.json();
   })) as AlbumPhoto[];
+
+export const getPhotos = async () =>
+  (await fetch(`https://jsonplaceholder.typicode.com/photos`).then((r) =>
+    r.json()
+  )) as AlbumPhoto[];

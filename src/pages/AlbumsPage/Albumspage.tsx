@@ -1,40 +1,55 @@
-import React, { Suspense } from 'react';
-import { Await, defer, useLoaderData } from 'react-router';
-import { Link } from 'react-router-dom';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
+import React, { useEffect } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+import { Link, Navigate } from 'react-router-dom';
+import { Action } from 'redux';
+import { ThunkDispatch } from 'redux-thunk';
 import Loader from '../../components/Loader/Loader';
-import { getAlbums } from '../../fetchRoutes/albums';
-import { Album } from '../../types/types';
+import { fetchAlbums } from '../../redux/albums/actions';
+import { RootState } from '../../redux/store';
 import './albumspage.scss';
 
-export const loader = () => defer({ albums: getAlbums() });
+const mapDispatchToProp = (dispatch: ThunkDispatch<RootState, void, Action>) => {
+  return {
+    fetchAlbums: () => dispatch(fetchAlbums()),
+  };
+};
 
-function Albumspage() {
-  const { albums } = useLoaderData() as { albums: Promise<Album[]> };
+const mapStateToProp = (state: RootState) => {
+  return {
+    ...state.albums,
+  };
+};
 
-  return (
-    <Suspense fallback={<Loader />}>
-      <Await
-        resolve={albums}
-        errorElement={<ErrorMessage />}
-      >
-        {(albums: Album[]) => (
-          <ul className='albums-list'>
-            {albums.map((album) => (
-              <li key={album.id}>
-                <Link
-                  to={`${album.id}`}
-                  className='albums-list__item'
-                >
-                  {album.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Await>
-    </Suspense>
+const connector = connect(mapStateToProp, mapDispatchToProp);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type Props = PropsFromRedux;
+
+function Albumspage({ data, error, loading, fetchAlbums }: Props) {
+  useEffect(() => {
+    if (!data) {
+      fetchAlbums();
+    }
+  }, [data, fetchAlbums]);
+
+  if (error) return <Navigate to='/oops' />;
+
+  return loading ? (
+    <Loader />
+  ) : (
+    <ul className='albums-list'>
+      {data?.map((album) => (
+        <li key={album.id}>
+          <Link
+            to={`${album.id}`}
+            className='albums-list__item'
+          >
+            {album.title}
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-export default Albumspage;
+export default connector(Albumspage);

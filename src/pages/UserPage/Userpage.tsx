@@ -1,73 +1,89 @@
-import React, { Suspense } from 'react';
-import { Await, useLoaderData, LoaderFunction, Link, defer } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import Loader from '../../components/Loader/Loader';
-import { getUserAlbums } from '../../fetchRoutes/albums';
-import { getUser } from '../../fetchRoutes/users';
-import { UserFull } from '../../types/types';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
+import { ThunkDispatch } from 'redux-thunk';
+import { RootState } from '../../redux/store';
+import { Action } from 'redux';
+import { fetchUsers } from '../../redux/users/actions';
+import { fetchAlbums } from '../../redux/albums/actions';
+import { connect, ConnectedProps, useSelector } from 'react-redux';
+import { useParams } from 'react-router';
+import { selectUser } from '../../redux/users/selector';
+import { selectAlbumsUserId } from '../../redux/albums/selector';
 import './userpage.scss';
+import Notfoundpage from '../NotFoundPage/Notfoundpage';
 
-export const loader: LoaderFunction = ({ params: { id } }) => {
-  const userPromise = new Promise(async (res, rej) => {
-    try {
-      const user = await getUser(id || '');
-      const albums = await getUserAlbums(id || '');
-      res({ user, albums });
-    } catch (e) {
-      rej((e as Error).message);
-    }
-  });
-
-  return defer({ userPromise });
+const mapDispatchToProp = (dispatch: ThunkDispatch<RootState, void, Action>) => {
+  return {
+    fetchUsers: () => dispatch(fetchUsers()),
+    fetchAlbums: () => dispatch(fetchAlbums()),
+  };
 };
 
-function Userpage() {
-  const { userPromise } = useLoaderData() as {
-    userPromise: Promise<UserFull>;
+const mapStateToProp = (state: RootState) => {
+  return {
+    users: state.users.data,
+    albums: state.albums.data,
+    loading: state.users.loading || state.albums.loading,
+    error: state.users.error || state.albums.error,
   };
-  return (
-    <Suspense fallback={<Loader />}>
-      <Await
-        resolve={userPromise}
-        errorElement={<ErrorMessage />}
-      >
-        {(userObj: UserFull) => (
-          <div className='user'>
-            <div className='user-info'>
-              <h3 className='user-info__name'>{userObj.user.name}</h3>
-              <p className='user-info__surname user-info__sub'>Username: {userObj.user.username}</p>
-              <p className='user-info__email user-info__sub'>
-                Email: <a href={`mailto:${userObj.user.email}`}>{userObj.user.email} </a>
-              </p>
-              <p className='user-info__phone user-info__sub'>Phone: {userObj.user.phone}</p>
-              <p className='user-info__website user-info__sub'>
-                Site:{' '}
-                <a
-                  href={`http://${userObj.user.website}`}
-                  target='blank'
-                >
-                  {userObj.user.website}
-                </a>
-              </p>
-            </div>
-            <div>
-              <h4>{`${/^.* /.exec(userObj.user.name)}'s albums:`}</h4>
-              <ul className='user-albums'>
-                {userObj.albums.map((album) => (
-                  <li
-                    key={album.id}
-                    className='user-albums__item'
-                  >
-                    <Link to={`/albums/${album.id}`}>{album.title}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-      </Await>
-    </Suspense>
+};
+
+const connector = connect(mapStateToProp, mapDispatchToProp);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type Props = PropsFromRedux;
+
+function Userpage({ users, albums, error, loading, fetchUsers, fetchAlbums }: Props) {
+  const { id } = useParams();
+
+  const user = useSelector(selectUser(Number(id))) || null;
+  const userAlbums = useSelector(selectAlbumsUserId(Number(id)));
+
+  useEffect(() => {
+    if (!users) fetchUsers();
+    if (!albums) fetchAlbums();
+  }, [albums, fetchAlbums, fetchUsers, users]);
+
+  if (error) return <Navigate to='/oops' />;
+  if (users && user === null) return <Notfoundpage />;
+
+  return loading ? (
+    <Loader />
+  ) : (
+    <div className='user'>
+      <div className='user-info'>
+        <h3 className='user-info__name'>{user?.name}</h3>
+        <p className='user-info__surname user-info__sub'>Username: {user?.username}</p>
+        <p className='user-info__email user-info__sub'>
+          Email: <a href={`mailto:${user?.email}`}>{user?.email} </a>
+        </p>
+        <p className='user-info__phone user-info__sub'>Phone: {user?.phone}</p>
+        <p className='user-info__website user-info__sub'>
+          Site:{' '}
+          <a
+            href={`http://${user?.website}`}
+            target='blank'
+          >
+            {user?.website}
+          </a>
+        </p>
+      </div>
+      <div>
+        <h4>{`${/^.* /.exec(user?.name || '')}'s albums:`}</h4>
+        <ul className='user-albums'>
+          {userAlbums?.map((album) => (
+            <li
+              key={album.id}
+              className='user-albums__item'
+            >
+              <Link to={`/albums/${album.id}`}>{album.title}</Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
-export default Userpage;
+export default connector(Userpage);

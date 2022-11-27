@@ -1,5 +1,3 @@
-import { PathOrFileDescriptor } from 'fs';
-
 export interface User {
   id: number;
   name: string;

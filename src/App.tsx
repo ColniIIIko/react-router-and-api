@@ -5,13 +5,17 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from 'react-router-dom';
-import Albumpage, { loader as albumLoader } from './pages/AlbumPage/Albumpage';
-import Albumspage, { loader as albumsLoader } from './pages/AlbumsPage/Albumspage';
+
+import { Provider } from 'react-redux';
+
+import Albumpage from './pages/AlbumPage/Albumpage';
+import Albumspage from './pages/AlbumsPage/Albumspage';
 import Homepage from './pages/Homepage/Homepage';
 import Layout from './pages/Layout/Layout';
 import Notfoundpage from './pages/NotFoundPage/Notfoundpage';
-import Userpage, { loader as userLoader } from './pages/UserPage/Userpage';
-import Userspage, { loader as usersLoader } from './pages/UsersPage/Userspage';
+import Userpage from './pages/UserPage/Userpage';
+import Userspage from './pages/UsersPage/Userspage';
+import { store } from './redux/store';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,22 +30,18 @@ const router = createBrowserRouter(
       <Route
         path='users'
         element={<Userspage />}
-        loader={usersLoader}
       />
       <Route
         path='users/:id'
         element={<Userpage />}
-        loader={userLoader}
       />
       <Route
         path='albums'
         element={<Albumspage />}
-        loader={albumsLoader}
       />
       <Route
         path='albums/:id'
         element={<Albumpage />}
-        loader={albumLoader}
       />
       <Route
         path='*'
@@ -53,7 +53,11 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  );
 }
 
 export default App;
