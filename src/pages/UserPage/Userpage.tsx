@@ -37,7 +37,7 @@ type Props = PropsFromRedux;
 function Userpage({ users, albums, error, loading, fetchUsers, fetchAlbums }: Props) {
   const { id } = useParams();
 
-  const user = useSelector(selectUser(Number(id))) || null;
+  const user = useSelector(selectUser(Number(id)));
   const userAlbums = useSelector(selectAlbumsUserId(Number(id)));
 
   useEffect(() => {

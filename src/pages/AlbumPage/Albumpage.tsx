@@ -50,7 +50,7 @@ function Albumpage({
 }: Props) {
   const { id } = useParams();
 
-  const userAlbum = useSelector(selectAlbum(Number(id))) || null;
+  const userAlbum = useSelector(selectAlbum(Number(id)));
   const user = useSelector(selectUser(userAlbum?.userId || -1));
   const albumPhoto = useSelector(selectAlbumsPhoto(userAlbum?.id || -1));
 
