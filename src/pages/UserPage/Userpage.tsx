@@ -6,7 +6,7 @@ import { RootState } from '../../redux/store';
 import { Action } from 'redux';
 import { fetchUsers } from '../../redux/users/actions';
 import { fetchAlbums } from '../../redux/albums/actions';
-import { connect, ConnectedProps, useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 import { selectUser } from '../../redux/users/selector';
 import { selectAlbumsUserId } from '../../redux/albums/selector';
@@ -29,12 +29,10 @@ const mapStateToProp = (state: RootState) => {
   };
 };
 
-const connector = connect(mapStateToProp, mapDispatchToProp);
-type PropsFromRedux = ConnectedProps<typeof connector>;
+type State = ReturnType<typeof mapStateToProp>;
+type Dispatch = ReturnType<typeof mapDispatchToProp>;
 
-type Props = PropsFromRedux;
-
-function Userpage({ users, albums, error, loading, fetchUsers, fetchAlbums }: Props) {
+function Userpage({ users, albums, error, loading, fetchUsers, fetchAlbums }: State & Dispatch) {
   const { id } = useParams();
 
   const user = useSelector(selectUser(Number(id)));
@@ -86,4 +84,4 @@ function Userpage({ users, albums, error, loading, fetchUsers, fetchAlbums }: Pr
   );
 }
 
-export default connector(Userpage);
+export default connect(mapStateToProp, mapDispatchToProp)(Userpage);

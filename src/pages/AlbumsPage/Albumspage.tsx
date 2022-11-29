@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { connect, ConnectedProps } from 'react-redux';
+import { connect } from 'react-redux';
 import { Link, Navigate } from 'react-router-dom';
 import { Action } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';
@@ -20,12 +20,10 @@ const mapStateToProp = (state: RootState) => {
   };
 };
 
-const connector = connect(mapStateToProp, mapDispatchToProp);
-type PropsFromRedux = ConnectedProps<typeof connector>;
+type State = ReturnType<typeof mapStateToProp>;
+type Dispatch = ReturnType<typeof mapDispatchToProp>;
 
-type Props = PropsFromRedux;
-
-function Albumspage({ data, error, loading, fetchAlbums }: Props) {
+function Albumspage({ data, error, loading, fetchAlbums }: State & Dispatch) {
   useEffect(() => {
     if (!data) {
       fetchAlbums();
@@ -52,4 +50,4 @@ function Albumspage({ data, error, loading, fetchAlbums }: Props) {
   );
 }
 
-export default connector(Albumspage);
+export default connect(mapStateToProp, mapDispatchToProp)(Albumspage);

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { connect, ConnectedProps, useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { Navigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { Action } from 'redux';
@@ -33,10 +33,8 @@ const mapStateToProp = (state: RootState) => {
   };
 };
 
-const connector = connect(mapStateToProp, mapDispatchToProp);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-type Props = PropsFromRedux;
+type State = ReturnType<typeof mapStateToProp>;
+type Dispatch = ReturnType<typeof mapDispatchToProp>;
 
 function Albumpage({
   users,
@@ -47,7 +45,7 @@ function Albumpage({
   fetchUsers,
   fetchAlbums,
   fetchPhotos,
-}: Props) {
+}: State & Dispatch) {
   const { id } = useParams();
 
   const userAlbum = useSelector(selectAlbum(Number(id)));
@@ -85,4 +83,4 @@ function Albumpage({
   );
 }
 
-export default connector(Albumpage);
+export default connect(mapStateToProp, mapDispatchToProp)(Albumpage);

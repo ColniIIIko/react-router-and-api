@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { connect, ConnectedProps } from 'react-redux';
+import { connect } from 'react-redux';
 import Loader from '../../components/Loader/Loader';
 import { fetchUsers } from '../../redux/users/actions';
 import { ThunkDispatch } from 'redux-thunk';
@@ -20,12 +20,10 @@ const mapStateToProp = (state: RootState) => {
   };
 };
 
-const connector = connect(mapStateToProp, mapDispatchToProp);
-type PropsFromRedux = ConnectedProps<typeof connector>;
+type State = ReturnType<typeof mapStateToProp>;
+type Dispatch = ReturnType<typeof mapDispatchToProp>;
 
-type Props = PropsFromRedux;
-
-function Userspage({ data, loading, error, fetchUsers }: Props) {
+function Userspage({ data, loading, error, fetchUsers }: State & Dispatch) {
   useEffect(() => {
     if (!data) {
       fetchUsers();
@@ -52,4 +50,4 @@ function Userspage({ data, loading, error, fetchUsers }: Props) {
   );
 }
 
-export default connector(Userspage);
+export default connect(mapStateToProp, mapDispatchToProp)(Userspage);
